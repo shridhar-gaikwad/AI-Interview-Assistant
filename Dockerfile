@@ -1,4 +1,4 @@
-# Use official Maven + JDK image
+# Stage 1: Build (Use official Maven + JDK image)
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 
 WORKDIR /usr/src/app
@@ -10,8 +10,8 @@ COPY src ./src
 # Build the project
 RUN mvn clean package -DskipTests
 
-# Runtime image
-FROM eclipse-temurin:17-jdk
+# Runtime image (Using jre as we are already using jdk in build stage)
+FROM eclipse-temurin:17-jre
 
 WORKDIR /usr/src/app
 
