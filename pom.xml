@@ -18,22 +18,16 @@
 
     <properties>
         <java.version>17</java.version>
-        <spring.boot.version>3.5.4</spring.boot.version>
-        <spring.ai.version>1.0.9</spring.ai.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.ai.version>1.0.9</spring.ai.version>
     </properties>
 
+    <!-- The BOM (Bill Of Materials) centrally pins versions for all Spring AI
+         modules, so individual dependencies below can omit their <version>. -->
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
@@ -45,44 +39,23 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Core Spring Boot -->
+        <!-- Core Spring Boot: gives us auto-configuration, logging, and the
+             SpringApplication bootstrap. No web server yet - just enough to boot. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- CLI Support -->
-        <dependency>
-            <groupId>org.springframework.shell</groupId>
-            <artifactId>spring-shell-starter</artifactId>
-            <version>3.4.1</version>
-        </dependency>
-
-        <!-- Spring AI Ollama -->
+        <!-- Spring AI + Ollama: auto-configures an OllamaChatModel and a
+             ChatClient.Builder from the spring.ai.ollama.* properties in
+             application.yml. This is what lets us call a local LLM. -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-ollama</artifactId>
         </dependency>
-
-        <!-- Lombok (optional, for cleaner code) -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!-- Reactive web server (Netty) -->
+        <!-- Reactive web stack: starts an embedded Netty server on port 8080.
+             Provides Spring WebFlux (@RestController with reactive types) plus
+             WebClient, which Spring AI uses for streaming (.stream()) responses. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>

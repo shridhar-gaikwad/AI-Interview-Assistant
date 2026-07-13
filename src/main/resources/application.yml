@@ -2,15 +2,24 @@ spring:
   application:
     name: ai-interview-assistant
 
+  # HTTP client timeouts used by the RestClient that Spring AI calls Ollama with.
+  # A CPU-only 7B model can take a while to generate longer answers, so we give
+  # it a generous read timeout to avoid ReadTimeoutException on slow generations.
+  http:
+    client:
+      connect-timeout: 30s
+      read-timeout: 300s
+
   ai:
     ollama:                 # Ollama local endpoint configuration
+      base-url: "http://localhost:11434"   # where the Ollama server listens
       chat:
-        model: phi3.5   # default model
         options:
-          temperature: 0.7  # controls creativity
-          top_p: 0.9        # nucleus sampling
-          max_tokens: 512   # response length
-    base-url: "http://localhost:11434"
+          model: qwen2.5:7b   # the local model we pulled; change to llama3.2:3b for faster CPU responses
+          temperature: 0.7    # 0 = deterministic, higher = more creative
+          top-p: 0.9          # nucleus sampling
+    init:
+      pull-model-strategy: never   # don't let Spring auto-pull; we manage models with `ollama pull`
 
 logging:
   level:

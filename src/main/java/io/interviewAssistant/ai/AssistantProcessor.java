@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AssistantProcessor {
 
     public static void main(String[] args) {
+
         SpringApplication.run(AssistantProcessor.class, args);
+
     }
 
 }
