@@ -1,0 +1,12 @@
+### Maven ###
+target/
+git.properties
+
+### IntelliJ IDEA ###
+.idea
+*.iml
+dependency-reduced-pom.xml
+
+### VSCode ###
+.vscode
+.DS_Store
