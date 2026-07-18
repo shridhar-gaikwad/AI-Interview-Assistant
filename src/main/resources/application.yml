@@ -10,6 +10,13 @@ spring:
       connect-timeout: 30s
       read-timeout: 300s
 
+  # PostgreSQL connection for the pgvector store. Defaults target a local
+  # Postgres (e.g. the docker-compose `postgres` service mapped to localhost).
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/interview}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+
   ai:
     ollama:                 # Ollama local endpoint configuration
       base-url: "http://localhost:11434"   # where the Ollama server listens
@@ -22,8 +29,31 @@ spring:
           model: ${OLLAMA_MODEL:qwen2.5:7b}
           temperature: 0.7    # 0 = deterministic, higher = more creative
           top-p: 0.9          # nucleus sampling
+      embedding:
+        options:
+          # Embedding model that converts text into vectors for RAG.
+          # nomic-embed-text outputs 768-dim vectors (see pgvector dimensions).
+          model: ${OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
     init:
       pull-model-strategy: never   # don't let Spring auto-pull; we manage models with `ollama pull`
+
+    vectorstore:
+      pgvector:
+        # Create the vector_store table + pgvector extension on startup if absent.
+        initialize-schema: true
+        index-type: HNSW              # fast approximate-nearest-neighbour index
+        distance-type: COSINE_DISTANCE
+        dimensions: 768               # MUST match the embedding model's output size
+
+# Application-specific RAG tuning, read via @Value in the RAG components.
+app:
+  rag:
+    # Folder (classpath) that ingestion reads source documents from.
+    docs-location: "classpath:/docs/*"
+    # How many of the most relevant chunks to inject into the prompt.
+    top-k: 4
+    # Ignore retrieved chunks weaker than this similarity score (0..1).
+    similarity-threshold: 0.5
 
 logging:
   level:

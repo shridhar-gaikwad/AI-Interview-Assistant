@@ -60,6 +60,35 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+
+        <!-- JDBC + HikariCP: guarantees a pooled DataSource is auto-configured
+             for the pgvector store's JdbcTemplate to use. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+
+        <!-- PGVector vector store: auto-configures a VectorStore backed by
+             PostgreSQL + the pgvector extension. Brings in Spring JDBC and the
+             schema auto-initialization used to store document embeddings. -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+        </dependency>
+
+        <!-- Vector-store advisors: provides QuestionAnswerAdvisor, which does the
+             RAG plumbing (similarity search + prompt augmentation) for a ChatClient. -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-advisors-vector-store</artifactId>
+        </dependency>
+
+        <!-- PostgreSQL JDBC driver used by the pgvector store's JdbcTemplate. -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>

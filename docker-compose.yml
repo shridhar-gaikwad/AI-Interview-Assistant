@@ -12,12 +12,19 @@ services:
     command: mvn spring-boot:run
     depends_on:
       - ollama
+      - postgres
     environment:
       SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
       # Model name sourced from the shared .env (OLLAMA_MODEL). This overrides
       # the value in application.yml so the app and the ollama container below
       # always request/pull the exact same model.
       SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: ${OLLAMA_MODEL}
+      # Embedding model used to turn documents/questions into vectors for RAG.
+      SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: ${OLLAMA_EMBEDDING_MODEL}
+      # Point the app at the pgvector container (service name = hostname).
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
 
   ollama:
     image: ollama/ollama:latest
@@ -27,9 +34,32 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
-    # Pull the same model the app expects, using the shared .env value.
+    # Pull BOTH the chat model and the embedding model (RAG needs embeddings),
+    # then start serving. Values come from the shared .env.
     entrypoint: >
-      sh -c "ollama pull ${OLLAMA_MODEL} && ollama serve"
+      sh -c "ollama pull ${OLLAMA_MODEL} && ollama pull ${OLLAMA_EMBEDDING_MODEL} && ollama serve"
+
+  # PostgreSQL with the pgvector extension pre-installed. Stores document
+  # chunks and their embedding vectors so we can do similarity search for RAG.
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: pgvector_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    # Wait until Postgres is actually accepting connections before the app relies on it.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   ollama_data:
+  pgvector_data:
