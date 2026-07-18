@@ -10,3 +10,8 @@ dependency-reduced-pom.xml
 ### VSCode ###
 .vscode
 .DS_Store
+
+### Environment ###
+# Local environment overrides. Keep secrets/machine-specific values out of git.
+# Commit .env.example instead as a template.
+.env

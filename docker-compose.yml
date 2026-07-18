@@ -14,6 +14,10 @@ services:
       - ollama
     environment:
       SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
+      # Model name sourced from the shared .env (OLLAMA_MODEL). This overrides
+      # the value in application.yml so the app and the ollama container below
+      # always request/pull the exact same model.
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: ${OLLAMA_MODEL}
 
   ollama:
     image: ollama/ollama:latest
@@ -23,8 +27,9 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
+    # Pull the same model the app expects, using the shared .env value.
     entrypoint: >
-      sh -c "ollama pull qwen2.5:7b && ollama serve"
+      sh -c "ollama pull ${OLLAMA_MODEL} && ollama serve"
 
 volumes:
   ollama_data:

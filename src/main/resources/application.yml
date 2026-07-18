@@ -15,7 +15,11 @@ spring:
       base-url: "http://localhost:11434"   # where the Ollama server listens
       chat:
         options:
-          model: qwen2.5:7b   # the local model we pulled; change to llama3.2:3b for faster CPU responses
+          # Model name resolved from the OLLAMA_MODEL env var (shared with
+          # docker-compose via .env) so the app and container stay in sync.
+          # Falls back to qwen2.5:7b for plain local runs without the env var.
+          # Change to llama3.2:3b for faster CPU responses.
+          model: ${OLLAMA_MODEL:qwen2.5:7b}
           temperature: 0.7    # 0 = deterministic, higher = more creative
           top-p: 0.9          # nucleus sampling
     init:
