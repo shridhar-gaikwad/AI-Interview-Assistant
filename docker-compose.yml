@@ -24,7 +24,7 @@ services:
       - ollama_data:/root/.ollama
     restart: unless-stopped
     entrypoint: >
-      sh -c "ollama pull llama3 && ollama serve"
+      sh -c "ollama pull qwen2.5:7b && ollama serve"
 
 volumes:
   ollama_data:
