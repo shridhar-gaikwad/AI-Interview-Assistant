@@ -34,15 +34,19 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
-    # `ollama pull` needs the server running first, so we start `ollama serve`
-    # in the background, wait until it responds, pull BOTH models (chat +
-    # embedding for RAG), then `wait` to keep the server in the foreground.
+    # Ollama's pull/list are CLIENT commands that need a running server. So:
+    #  1) start a TEMPORARY background server just to check/download the model,
+    #     pulling the configured model ONLY IF it is not already present,
+    #  2) stop that temporary server, then
+    #  3) start the real `ollama serve` as the container's main foreground process.
     entrypoint: >
       sh -c "ollama serve &
-      until ollama list >/dev/null 2>&1; do echo 'waiting for ollama...'; sleep 1; done &&
-      ollama pull ${OLLAMA_MODEL} &&
-      ollama pull ${OLLAMA_EMBEDDING_MODEL} &&
-      wait"
+      pid=$$!;
+      until ollama list >/dev/null 2>&1; do echo 'waiting for ollama...'; sleep 1; done;
+      ollama list | grep -q \"${OLLAMA_MODEL}\" || ollama pull \"${OLLAMA_MODEL}\";
+      kill $$pid; wait $$pid 2>/dev/null;
+      echo 'model ready, starting ollama serve...';
+      exec ollama serve"
 
   # PostgreSQL with the pgvector extension pre-installed. Stores document
   # chunks and their embedding vectors so we can do similarity search for RAG.
