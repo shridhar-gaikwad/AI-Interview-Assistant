@@ -1,18 +1,18 @@
-version: "3.9"
-
 services:
   app:
+    # Self-contained build via the multi-stage Dockerfile: it runs
+    # `mvn clean package` INSIDE the build container, downloading dependencies
+    # from Maven Central. No host Maven cache or settings.xml required, so this
+    # works on any machine that has Docker + internet access.
     build: .
     container_name: spring_app
     ports:
       - "8080:8080"
-    volumes:            # Remove later once done with development
-      - .:/usr/src/app
-    working_dir: /usr/src/app
-    command: mvn spring-boot:run
     depends_on:
-      - ollama
-      - postgres
+      postgres:
+        condition: service_healthy        # wait until the DB is ready
+      ollama:
+        condition: service_started
     environment:
       SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
       # Model name sourced from the shared .env (OLLAMA_MODEL). This overrides
