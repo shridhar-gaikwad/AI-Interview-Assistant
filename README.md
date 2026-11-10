@@ -9,7 +9,7 @@ It leverages modern AI models to provide realistic interview practice, explanati
 - **Java 17**
 - **Spring Boot**
 - **Spring AI**
-- **Maven 3.9.16**
+- **Maven 3.9.6**
 - **Docker 29.6.1**
 - **Git 2.45.1**
 - **Ollama** (for running local AI models)
