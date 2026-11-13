@@ -64,10 +64,6 @@ This version matches the `maven:3.9.6-eclipse-temurin-17` image used in the
 build stage of the project's `Dockerfile`, so a local `mvn` build and the
 Docker build behave the same way.
 
-> Note: `README.md`'s tech-stack table currently lists Maven 3.9.16. That value
-> is out of sync with the Dockerfile and should be treated as incorrect until
-> reconciled; this guide follows the Dockerfile's pinned 3.9.6.
-
 ### 2.1 Install (Windows)
 
 1. Download the binary zip archive for Maven **3.9.6** from the
@@ -352,7 +348,7 @@ triggered — it is not run automatically on startup. Before asking any
 RAG-grounded question, call:
 
 ```powershell
-curl -X POST http://localhost:8080/api/
+curl -X POST http://localhost:8080/api/rag/ingest
 ```
 
 This reads every file under `src/main/resources/docs/` (currently
