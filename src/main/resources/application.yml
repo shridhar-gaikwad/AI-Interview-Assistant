@@ -59,3 +59,10 @@ logging:
   level:
     root: INFO
     org.springframework.ai: DEBUG   # helpful to see AI interactions
+
+management:
+  endpoint:
+    health:
+      # Without this, /actuator/health only ever shows the aggregate status
+      # (UP/DOWN) and hides each indicator's details (e.g. why Ollama is down).
+      show-details: always
