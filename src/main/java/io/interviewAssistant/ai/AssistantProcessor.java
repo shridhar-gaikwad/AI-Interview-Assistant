@@ -13,7 +13,6 @@ public class AssistantProcessor {
     public static void main(String[] args) {
 
         SpringApplication.run(AssistantProcessor.class, args);
-        log.info("Application started");
 
     }
 
