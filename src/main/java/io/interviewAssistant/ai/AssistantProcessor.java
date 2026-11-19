@@ -7,9 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class AssistantProcessor {
-
-    private static final Logger log = LoggerFactory.getLogger(AssistantProcessor.class);
-
+    
     public static void main(String[] args) {
 
         SpringApplication.run(AssistantProcessor.class, args);
